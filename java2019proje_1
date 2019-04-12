@@ -1,0 +1,283 @@
+
+package java2019proje_1;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class Java2019Proje_1 {
+
+    public static void main(String[] args) {
+        Scanner dosya= null;
+        Scanner keyboard=new Scanner(System.in);
+        try{
+            System.out.println("Sistemde Araştırmak İstediğiniz Dosya İsmini Tam olarak(.txt vb) giriniz:");
+            dosya= new Scanner(new FileInputStream(keyboard.nextLine()));}
+        catch (FileNotFoundException e){
+            System.out.println("Girdiğiniz Dosya Sistemde Bulunamadı.");
+            System.exit(0);
+        }
+        //Text Dosyasınn İlk Satırı İçin İşlemler//
+        String birinciSatir=dosya.nextLine();
+        StringTokenizer birinciBolum = new StringTokenizer(birinciSatir,",");
+        int ogretimElemanSay=Integer.valueOf(birinciBolum.nextToken());
+        String[] ogretimElemanlari=new String [ogretimElemanSay];
+        for(int i=0;i<ogretimElemanSay;i++){
+            String token=birinciBolum.nextToken();
+            ogretimElemanlari[i]=token;
+        }
+        //Text Dosyasının Geri Kalan Tüm Satırları İçin İşlemler//   
+        Student[] Ogrenci=new Student[200];
+        int Derecelendirme[][]=new int[200][ogretimElemanSay];
+        double[] graduateToplam=new double [ogretimElemanSay];
+        double[] undergraduateToplam=new double[ogretimElemanSay];
+        double[] yapayZekaToplam=new double [ogretimElemanSay];
+        int i=0;
+        int k=0;
+        int lisansYapayZekaSay=0;
+        int UndergraduateOgrenciSay=0;
+        int GraduateOgrenciiSay=0;
+        while(dosya.hasNextLine()){
+            String yeniSatir=dosya.nextLine();
+            StringTokenizer yeniBolum = new StringTokenizer(yeniSatir,",");
+            String token=yeniBolum.nextToken();
+            //Okunan satırın ilk karakterine göre hangi işlemi yapması gerektiği belirlenir.//
+            if("u".equals(token) || "g".equals(token)){
+                //Eğer ilk karakter u ise UnderGraduate'e ait işlemler//
+                if("u".equals(token)){
+                    int ID=Integer.valueOf(yeniBolum.nextToken());
+                    String ad=yeniBolum.nextToken();
+                    String soyad=yeniBolum.nextToken();
+                    String track=yeniBolum.nextToken();
+                    UnderGraduate u1 = new UnderGraduate(ID,ad,soyad,track);
+                    Ogrenci[i]=u1;
+                    UndergraduateOgrenciSay++;
+                }
+                //Eğer ilk karakter g ise Graduate'e ait işlemler//
+                else if("g".equals(token)){
+                    int ID=Integer.valueOf(yeniBolum.nextToken());
+                    String ad=yeniBolum.nextToken();
+                    String soyad=yeniBolum.nextToken();
+                    String subject=yeniBolum.nextToken();
+                    String advisor=yeniBolum.nextToken();
+                    Graduate g1 = new Graduate(ID,ad,soyad,subject,advisor);
+                    Ogrenci[i]=g1;
+                    GraduateOgrenciiSay++;
+                }
+                i++;
+            }else{
+                //İki boyutlu liste ile verilen puanları kaydetme//
+                Derecelendirme[i-1][0]=Integer.valueOf(token);
+                for(int r=1;r<ogretimElemanSay;r++){
+                    Derecelendirme[k][r]=Integer.valueOf(yeniBolum.nextToken());
+                }
+                k++;
+                //Lisansüstü öğrencilerinin aynı öğretim görevlisi için verdikleri toplam puanı bulma//
+                if(Ogrenci[i-1].getClass()==Graduate.class){
+                    for(int u=0;u<ogretimElemanSay;u++){
+                        graduateToplam[u]+=Derecelendirme[i-1][u];   
+                    }   
+                //Lisans öğrencilerinin aynı öğretim görevlisi için verdikleri toplam puanı bulma//
+                }else if(Ogrenci[i-1].getClass()==UnderGraduate.class){
+                    for(int z=0;z<ogretimElemanSay;z++){
+                        undergraduateToplam[z]+=Derecelendirme[i-1][z];
+                    }
+                    //Lisans öğrencilerinden izlediği patika yapay zeka olanların verdikleri toplam puanı bulma//
+                    String str=Ogrenci[i-1].toString();
+                    int boyut=str.length();
+                    if ("Yapay zeka".equals(str.substring(boyut-10,boyut))){
+                        for(int u=0;u<ogretimElemanSay;u++){
+                            yapayZekaToplam[u]+=Derecelendirme[i-1][u];
+                        }
+                        lisansYapayZekaSay++;
+                    }
+                }
+            }
+        }
+        System.out.println("\n----ALINAN DOSYAYA GÖRE OLUŞAN SONUÇLAR----\n");
+        //Tüm öğrenciler geneli ortalama puanı bulma//
+        System.out.println("> ÖĞRETİM GÖREVLİLERİ İÇİN GENEL ORTALAMA DERECELENDİRME PUANLARI <");
+        double[] genelOrtalama=new double[ogretimElemanSay];
+        for (int s=0;s<ogretimElemanSay;s++){    
+            double ogrtGorevToplam=0;
+            for(int t=0;t<UndergraduateOgrenciSay+GraduateOgrenciiSay;t++){
+                ogrtGorevToplam+=Derecelendirme[t][s];
+                double genelOrt=ogrtGorevToplam/(UndergraduateOgrenciSay+GraduateOgrenciiSay);
+                genelOrtalama[s]=genelOrt;
+            }
+            System.out.printf(s+1+".öğretim görevlisine ait ortalama derecelendirme puanı:"+"%.2f%n",ogrtGorevToplam/(UndergraduateOgrenciSay+GraduateOgrenciiSay));
+        }
+    
+        //Lisans öğrencileri için ortalama değerleri yazdırma//
+        //Ortalama altında puan veren lisans öğrencileri için ortalama değerleri tutan liste oluşturma //
+        double[] undergraduateOrtalama=new double[ogretimElemanSay];
+        System.out.println("\n> LİSANS ÖĞRENCİLERİ DİKKATE ALINARAK ÖĞRETİM GÖREVLİLERİ İÇİN ORTALAMA DERECELENDİRME PUANLARI <");
+        for(int b=0;b<ogretimElemanSay;b++){
+            double graduateOrt=undergraduateToplam[b]/UndergraduateOgrenciSay;
+            undergraduateOrtalama[b]=graduateOrt;
+            System.out.printf(b+1+".öğretim görevlisine ait ortalama derecelendirme puanı:"+"%.2f%n",undergraduateOrtalama[b]);
+        }
+        //Lisansüstü öğrencileri için ortalama değerleri yazdırma//
+        //Ortalama altında puan veren lisansüstü öğrenciler için ortalama değerleri tutan liste oluşturma//
+        double[] graduateOrtalama=new double[ogretimElemanSay];
+        System.out.println("\n> LİSANÜSTÜ ÖĞRENCİLERİ DİKKATE ALINARAK ÖĞRETİM GÖREVLİLERİ İÇİN ORTALAMA DERECELENDİRME PUANLARI <");
+        for(int b=0;b<ogretimElemanSay;b++){
+            double undergraduateOrt=graduateToplam[b]/GraduateOgrenciiSay;
+            graduateOrtalama[b]=undergraduateOrt;
+            System.out.printf(b+1+".öğretim görevlisine ait ortalama derecelendirme puanı:"+"%.2f%n",graduateOrtalama[b]);
+        }
+        //Lisans öğrencilerinden izlediği patika yapay zeka olanlar için ortalama değerleri yazdırma//    
+        System.out.println("\n> LİSANS ÖĞRENCİLERİNDEN İZLEDİĞİ PATİKA YAPAY ZEKA OLANLAR DİKKATE ALINARAK ÖĞRETİM GÖREVLİLERİ İÇİN ORTALAMA DERECELENDİRME PUANLARI <");        
+        for(int b=0;b<ogretimElemanSay;b++){
+            System.out.printf(b+1+".öğretim görevlisine ait ortalama derecelendirme puanı:"+"%.2f%n",yapayZekaToplam[b]/lisansYapayZekaSay);
+        }
+        //Her öğretim görevlisine ait genel ortalama derecelendirmenin altında puan veren öğrencileri öğretim görevlilerine göre analiz etme//
+        System.out.println("\n--HER BİR ÖĞRENİM GÖREVLİSİNE AİT GENEL ORTALAMA DERECELENDİRMENİN ALTINDA PUAN VEREN ÖĞRENCİLER--");
+        for (int r=0;r<ogretimElemanSay;r++){
+            System.out.println("\n"+ogretimElemanlari[r]+" ÖĞRETİM GÖREVLİSİ İÇİN:\n");
+            for(int f=0;f<UndergraduateOgrenciSay+GraduateOgrenciiSay;f++){
+                if(Ogrenci[f].getClass()==Graduate.class){
+                    if(Derecelendirme[f][r]<genelOrtalama[r]){
+                        System.out.println("--> Lisanüstü Öğrencisi <--");
+                        System.out.println(Ogrenci[f].toString()+"\n");
+                    }
+                }else if(Ogrenci[f].getClass()==UnderGraduate.class){
+                    if(Derecelendirme[f][r]<genelOrtalama[r]){
+                        System.out.println("--> Lisans Öğrencisi <--");
+                        System.out.println(Ogrenci[f].toString()+"\n");
+                    }    
+                }
+            }
+            System.out.println("------------------------------");
+        }
+        //Yeni öğrenci girdisini alma amaçlı yazılan bölüm//
+        int[]Benzerlik=new int[UndergraduateOgrenciSay+GraduateOgrenciiSay];
+        int kod;
+        System.out.println("--> YENİ ÖĞRENCİ GİRME DURUMU <-- \n");
+        int sonradanEklenenGraduate=0;
+        int sonradanEklenenUnderGraduate=0;
+        do{
+            System.out.println("Öğrenci tipini giriniz(g veya u):");
+            String musteriTip=keyboard.next();
+            //Yeni öğrenciyi lisans ve lisansütün diye ayırma//
+            if("u".equals(musteriTip)){
+                sonradanEklenenUnderGraduate++;
+                System.out.println("Öğrenci ID Giriniz:");
+                int ID=keyboard.nextInt();
+                keyboard.nextLine();
+                System.out.println("Öğrencinin Adını Giriniz:");
+                String ad=keyboard.nextLine();
+                System.out.println("Öğrencinin Soyadını Giriniz:");
+                String soyad=keyboard.nextLine();
+                System.out.println("Öğrencinin İzlediği Akademik Patikayı Giriniz:");
+                String track=keyboard.nextLine();
+                UnderGraduate u2 = new UnderGraduate(ID,ad,soyad,track);
+                Ogrenci[i]=u2;
+                for(int x=0;x<ogretimElemanSay;x++){
+                    if(x<ogretimElemanSay-1){
+                    System.out.println(x+1+".öğretim görevlerisi için puan giriniz:");
+                    int ogrtGorevPuan=keyboard.nextInt();
+                    Derecelendirme[i][x]=ogrtGorevPuan;
+                    //Kullanıcının Girdiği Öğretim Görevlilerinden 5.Öğretim Görevlisine Verilen Puanı Bulma//
+                    }else if(x==ogretimElemanSay-1){
+                        for(int u=0;u<UndergraduateOgrenciSay+GraduateOgrenciiSay;u++){
+                            for(int c=0;c<ogretimElemanSay-1;c++){
+                                Benzerlik[u]+=Math.abs(Derecelendirme[u+1][c]-Derecelendirme[u][c]);
+                            }
+                        }
+                        int minBenzerlik=1000;
+                        for(int t=0;t<UndergraduateOgrenciSay+GraduateOgrenciiSay;t++){
+                            if(Benzerlik[t]<minBenzerlik){
+                                minBenzerlik=Benzerlik[t];
+                            }
+                        }
+                        int benzerMusteriToplam=0;
+                        int benzerMusteriSay=0;
+                        int verilenOrtalamaPuan;;
+                        for(int t=0;t<UndergraduateOgrenciSay+GraduateOgrenciiSay;t++){
+                            if(Benzerlik[t]==minBenzerlik){
+                                benzerMusteriToplam+=Derecelendirme[t][ogretimElemanSay-1];
+                                benzerMusteriSay++;
+                            }
+                        }
+                        verilenOrtalamaPuan=(int)Math.floor(benzerMusteriToplam/benzerMusteriSay);
+                        Derecelendirme[i][ogretimElemanSay-1]=verilenOrtalamaPuan;
+                        System.out.println("KULLANICIDAN ALINAN BİLGİLER SONUCUNDA OLUŞTURULAN ÖĞRENCİ BİLGİLERİ:\n");
+                        System.out.println("--> Lisans Öğrencisi <--");
+                        System.out.println(Ogrenci[i]);
+                        System.out.println("ÖĞRENCİNİN ÖĞRETİM GÖREVLİLERİNE VERDİĞİ PUANLAR:");
+                        for(int f=0;f<ogretimElemanSay;f++){
+                            System.out.println(f+1+".öğretim görevlisine verdiği puan:"+Derecelendirme[i][f]);
+                        }
+                    }
+                }
+                i++;
+            }else if("g".equals(musteriTip)){
+                sonradanEklenenGraduate++;
+                System.out.println("Öğrenci ID Giriniz:");
+                int ID=keyboard.nextInt();
+                keyboard.nextLine();//Yeni girilecek string ifadesinde sıkıntı oluşmaması için dummy yaratıldı.
+                System.out.println("Öğrencinin Adını Giriniz:");
+                String ad=keyboard.nextLine();
+                System.out.println("Öğrencinin Soyadını Giriniz:");
+                String soyad=keyboard.nextLine();
+                System.out.println("Öğrencinin Tez Konusunu Giriniz:");
+                String subject=keyboard.nextLine();
+                System.out.println("Öğrencinin Tez Danışmanını Giriniz:");
+                String advisor=keyboard.nextLine();
+                Graduate g2 = new Graduate(ID,ad,soyad,subject,advisor);
+                Ogrenci[i]=g2;
+                for(int x=0;x<ogretimElemanSay;x++){
+                    if(x<ogretimElemanSay-1){
+                    System.out.println(x+1+".öğretim görevlisi için puan giriniz:");
+                    int ogrtGorevPuan=keyboard.nextInt();
+                    Derecelendirme[i][x]=ogrtGorevPuan;
+                    //Kullanıcının Girdiği Öğretim Görevlilerinden 5.Öğretim Görevlisine Verilen Puanı Bulma//
+                    }else if(x==ogretimElemanSay-1){
+                        for(int u=0;u<UndergraduateOgrenciSay+GraduateOgrenciiSay;u++){
+                            for(int c=0;c<ogretimElemanSay-1;c++){
+                                Benzerlik[u]+=Math.abs(Derecelendirme[u+1][c]-Derecelendirme[u][c]);
+                            }
+                        }
+                        int minBenzerlik=9999;
+                        for(int t=0;t<UndergraduateOgrenciSay+GraduateOgrenciiSay;t++){
+                            if(Benzerlik[t]<minBenzerlik){
+                                minBenzerlik=Benzerlik[t];
+                            }
+                        }
+                        int benzerMusteriToplam=0;
+                        int benzerMusteriSay=1;
+                        int verilenOrtalamaPuan;
+                        for(int t=0;t<UndergraduateOgrenciSay+GraduateOgrenciiSay;t++){
+                            if(Benzerlik[t]<minBenzerlik){
+                                benzerMusteriToplam+=Derecelendirme[t][ogretimElemanSay-1];
+                                benzerMusteriSay++;
+                            }
+                        }
+                        verilenOrtalamaPuan=(int)Math.floor(benzerMusteriToplam/benzerMusteriSay);
+                        Derecelendirme[i][ogretimElemanSay-1]=verilenOrtalamaPuan;
+                        System.out.println(verilenOrtalamaPuan);
+                        System.out.println("KULLANICIDAN ALINAN BİLGİLER SONUCUNDA OLUŞTURULAN ÖĞRENCİ BİLGİLERİ:\n");
+                        System.out.println("--> Lisansüstü Öğrencisi <--");
+                        System.out.println(Ogrenci[i]);
+                        System.out.println("ÖĞRENCİNİN ÖĞRETİM GÖREVLİLERİNE VERDİĞİ PUANLAR:");
+                        for(int f=0;f<ogretimElemanSay;f++){
+                            System.out.println(f+1+".öğretim görevlisine verdiği puan:"+Derecelendirme[i][f]);
+                        }
+                    }
+                }
+                i++;
+            }
+            System.out.println("SİSTEMDEN ÇIKMAK İÇİN 0(SIFIR),DEVAM ETMEK İÇİN HERHANGİ BİR SAYI GİRİNİZ:");;
+            kod = keyboard.nextInt();
+        }while(kod != 0);
+            //Sonradan girilen öğrencilerin öğretim görevlilerine verdiği puanlar için ortalama değer bulma//
+            System.out.println("> SONRADAN EKLEMEN ÖĞRENCİLERE GÖRE ÖĞRETİM GÖREVLİLERİ İÇİN GENEL ORTALAMA DERECELENDİRME PUANLARI <");
+            for (int s=0;s<ogretimElemanSay;s++){
+                double ogrtGorevToplam=0;
+                ogrtGorevToplam+=Derecelendirme[UndergraduateOgrenciSay+GraduateOgrenciiSay][s];
+                System.out.printf(s+1+".öğretim görevlisine ait ortalama derecelendirme puanı:"+"%.2f%n",ogrtGorevToplam/(sonradanEklenenUnderGraduate+sonradanEklenenGraduate));
+            }
+        System.exit(0);
+    }
+}
