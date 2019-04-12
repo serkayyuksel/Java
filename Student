@@ -1,0 +1,77 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package java2019proje_1;
+
+/**
+ *
+ * @author mertg
+ */
+public class Student    
+{
+    private int StudentID;
+    private String Name;
+    private String Sname;
+    
+    public Student(Student st)
+    { //copy constructor
+        this.StudentID=st.StudentID;
+        this.Name=st.Name;
+        this.Sname=st.Sname;  
+    }
+    
+    public Student(int StudentID, String Name,String Sname)
+    {
+        this.StudentID=StudentID;
+        this.Name=Name;
+        this.Sname=Sname;
+    }
+    
+    public Student() 
+    {
+        StudentID = 0;
+        Name = null;
+        Sname =null;
+
+    }
+
+    public int getStudentID() 
+    {
+        return StudentID;
+    }
+
+    public String getName() 
+    {
+        return Name;
+    }
+
+    public String getSname() 
+    {
+        return Sname;
+    }
+
+    public void setStudentID(int StudentID) 
+    {
+        this.StudentID = StudentID;
+    }
+
+    public void setName(String Name) 
+    {
+        this.Name = Name;
+    }
+
+    public void setSname(String Sname) 
+    {
+        this.Sname = Sname;
+    }
+
+    @Override
+    public String toString() 
+    {
+        return "Öğrenci ID:"+getStudentID()+"\n"
+           +"Öğrencinin İsmi:"+getName()+"\n"+
+           "Öğrencinin Soyismi:"+getSname();
+    }
+}
