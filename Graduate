@@ -1,0 +1,66 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package java2019proje_1;
+
+/**
+ *
+ * @author mertg
+ */
+public class Graduate extends Student
+{
+    private String subject;
+    private String advisor;
+    
+    public Graduate(Graduate gr)
+    {
+        super(gr);
+        this.advisor=gr.advisor;
+        this.subject=gr.subject;
+    }
+    
+    public Graduate ()
+    {
+        super();
+        this.subject="";
+        this.advisor="";               
+    }
+    
+    public Graduate(int StudentID, String Name,String Sname,String subject,String advisor)
+    {
+        super(StudentID,Name,Sname);
+        this.subject=subject;
+        this.advisor=advisor;
+    }
+
+    public void setSubject(String subject)
+    {
+        this.subject = subject;
+    }
+
+    public void setAdvisor(String advisor)
+    {
+        this.advisor = advisor;
+    }
+
+    public String getSubject() 
+    {
+        return subject;
+    }
+
+    public String getAdvisor() 
+    {
+        return advisor;
+    }
+    
+    @Override
+    public String toString() 
+    {
+        String sonuc = super.toString();
+        sonuc +="\n"+ "Tez Konusu:" + getSubject() +"\n"+ "Tez Danışmanı:" + getAdvisor();
+        return sonuc;
+       
+    }
+}
