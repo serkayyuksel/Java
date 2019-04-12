@@ -1,0 +1,52 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package java2019proje_1;
+
+/**
+ *
+ * @author mertg
+ */
+public class UnderGraduate extends Student
+{
+    private String track;
+    
+    public UnderGraduate(UnderGraduate ug)//Copy Constructor
+    {
+        super(ug);
+        this.track=ug.track;  
+    }
+    
+    public UnderGraduate()
+    {
+        super();
+        this.track="";   
+    }
+    
+    public UnderGraduate(int StudentID,String Name,String Sname,String track)
+    {
+       super(StudentID,Name,Sname);
+       this.track=track;     
+    }
+    
+    public String getTrack() 
+    {
+        return track;
+    }
+
+    public void setTrack(String track) 
+    {
+        this.track = track;
+    }
+
+    @Override
+    public String toString() 
+    {
+        String sonuc = super.toString();
+        sonuc +="\n"+ "İzlediği Patika:" + getTrack() ;
+        return sonuc;
+        
+    }
+}
